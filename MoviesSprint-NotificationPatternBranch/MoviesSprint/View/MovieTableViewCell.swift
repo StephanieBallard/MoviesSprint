@@ -13,8 +13,6 @@ class MovieTableViewCell: UITableViewCell {
     @IBOutlet weak var hasBeenSeenButton: UIButton!
     @IBOutlet weak var movieTitleTextLabel: UILabel!
     
-    var delegate: MovieDelegate?
-    
     var movie: Movie? {
         didSet {
             updateViews()
@@ -32,9 +30,8 @@ class MovieTableViewCell: UITableViewCell {
     }
     
     @IBAction func hasBeenSeenButtonTapped(_ sender: UIButton) {
-        guard let movie = movie,
-            let delegate = delegate else { return }
-        delegate.updateMovie(movie: movie)
+        guard let movie = movie else { return }
+        NotificationCenter.default.post(name: .updateMovie, object: nil, userInfo: ["movie" : movie])
         updateViews()
     }
 }

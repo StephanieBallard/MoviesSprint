@@ -9,8 +9,6 @@
 import UIKit
 
 class AddMovieViewController: UIViewController {
-
-    var movieDelegate: MovieDelegate?
     
     @IBOutlet weak var movieTitleTextField: UITextField!
     
@@ -26,7 +24,7 @@ class AddMovieViewController: UIViewController {
             !newMovie.isEmpty {
             let movie = Movie(movieTitle: newMovie)
             
-            movieDelegate?.newMovieAdded(movie: movie)
+            NotificationCenter.default.post(name: .addMovie, object: nil, userInfo: ["title" : "\(movie)"])
             
             navigationController?.popViewController(animated: true)
         }

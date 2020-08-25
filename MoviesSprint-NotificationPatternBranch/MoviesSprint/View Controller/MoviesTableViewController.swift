@@ -9,13 +9,21 @@
 import UIKit
 
 class MoviesTableViewController: UITableViewController {
-
+    
     var movies: [Movie] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        NotificationCenter.default.addObserver(forName: .addMovie, object: nil, queue: .main, using: addMovie)
+        NotificationCenter.default.addObserver(forName: .updateMovie, object: nil, queue: .main, using: updateHasBeenSeen)
     }
-
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        tableView.reloadData()
+    }
+    
     // MARK: - Table view data source
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
@@ -26,7 +34,7 @@ class MoviesTableViewController: UITableViewController {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "MovieCell", for: indexPath) as? MovieTableViewCell else { return UITableViewCell() }
         let movie = movies[indexPath.row]
         cell.movie = movie
-        cell.delegate = self
+        
         return cell
     }
     
@@ -37,24 +45,25 @@ class MoviesTableViewController: UITableViewController {
         }    
     }
     
-    // MARK: - Navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == "AddMovieShowSegue" {
-            guard let addMovieVC = segue.destination as? AddMovieViewController else { return }
-            addMovieVC.movieDelegate = self
-        }
-    }
-}
-
-extension MoviesTableViewController: MovieDelegate {
-    func newMovieAdded(movie: Movie) {
+    private func addMovie(_ notification: Notification) {
+        guard let movie = notification.userInfo?["title"] as? Movie else { return }
         movies.append(movie)
         tableView.reloadData()
+        
     }
     
-    func updateMovie(movie: Movie) {
+    private func updateHasBeenSeen(_ notification: Notification) {
+        guard let movie = notification.userInfo?["movie"] as? Movie else { return }
         guard let movieIndex = movies.firstIndex(of: movie) else { return }
         movies[movieIndex].hasBeenSeen.toggle()
         tableView.reloadData()
     }
+    
+//    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+//           if segue.identifier == "AddMovieShowSegue" {
+//               guard let addMovieVC = segue.destination as? AddMovieViewController else { return }
+//                
+//           }
+//       }
 }
+
